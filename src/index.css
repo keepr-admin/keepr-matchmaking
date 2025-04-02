@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 120 10% 19%;
 
-    --primary: 120 100% 29.4%;
+    --primary: 120 70% 33%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 48 100% 78%;
@@ -33,7 +33,7 @@
 
     --border: 120 10% 84%;
     --input: 120 10% 84%;
-    --ring: 120 100% 29.4%;
+    --ring: 120 70% 33%;
 
     --radius: 0.75rem;
   }
@@ -81,6 +81,14 @@
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer;
+  }
+  
+  .btn-primary {
+    @apply bg-keepr-green-500 hover:bg-keepr-green-600 text-white font-medium px-4 py-2 rounded transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-keepr-green-600 border-keepr-green-400 border hover:bg-keepr-green-50 font-medium px-4 py-2 rounded transition-colors;
   }
 }

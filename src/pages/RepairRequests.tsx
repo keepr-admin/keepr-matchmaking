@@ -125,12 +125,12 @@ const RepairRequests = () => {
       
       <main className="flex-grow">
         {/* Header Section */}
-        <section className="bg-repair-green-100 py-12 px-4 md:px-8">
+        <section className="bg-keepr-green-100 py-12 px-4 md:px-8">
           <div className="container mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-repair-green-800 mb-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-keepr-green-800 mb-4 text-center">
               Repair Requests
             </h1>
-            <p className="text-lg text-repair-green-700 max-w-2xl mx-auto text-center mb-8">
+            <p className="text-lg text-keepr-green-700 max-w-2xl mx-auto text-center mb-8">
               Browse through repair requests in your area and choose one that matches your repair skills.
             </p>
             
@@ -138,7 +138,7 @@ const RepairRequests = () => {
             <div className="bg-white p-4 rounded-lg shadow-sm max-w-4xl mx-auto">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="relative flex-grow">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-repair-green-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-keepr-green-400 h-4 w-4" />
                   <Input
                     type="text"
                     placeholder="Search by device, brand, or description..."
@@ -184,57 +184,52 @@ const RepairRequests = () => {
             {filteredRequests.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredRequests.map((request) => (
-                  <Card key={request.id} className="border-repair-green-200 card-hover overflow-hidden">
-                    <div className="aspect-video relative overflow-hidden">
-                      <img
-                        src={request.image}
-                        alt={request.deviceType}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-2 right-2">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          request.status === "new" 
-                            ? "bg-repair-yellow-200 text-repair-green-700" 
-                            : "bg-repair-green-200 text-repair-green-700"
-                        }`}>
-                          {request.status === "new" ? "New" : "In Progress"}
-                        </span>
-                      </div>
-                    </div>
-                    <CardContent className="p-6">
-                      <div className="mb-3">
-                        <h3 className="text-lg font-semibold text-repair-green-700">{request.deviceType}</h3>
-                        <p className="text-repair-green-600 text-sm">
-                          {request.brand} {request.model}
-                        </p>
-                      </div>
-                      <p className="text-repair-green-600 mb-4 text-sm line-clamp-3">
-                        {request.description}
-                      </p>
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center">
-                          <Clock className="h-4 w-4 text-repair-green-500 mr-1" />
-                          <span className="text-xs text-repair-green-600">{request.createdAt}</span>
+                  <Link key={request.id} to={`/repair-requests/${request.id}`} className="block h-full">
+                    <Card className="border-keepr-green-200 card-hover overflow-hidden h-full">
+                      <div className="aspect-video relative overflow-hidden">
+                        <img
+                          src={request.image}
+                          alt={request.deviceType}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-2 right-2">
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            request.status === "new" 
+                              ? "bg-keepr-yellow-200 text-keepr-green-700" 
+                              : "bg-keepr-green-200 text-keepr-green-700"
+                          }`}>
+                            {request.status === "new" ? "New" : "In Progress"}
+                          </span>
                         </div>
-                        <Link to={`/repair-requests/${request.id}`}>
-                          <Button size="sm" variant="outline" className="text-repair-green-600 border-repair-green-300">
-                            View Details
-                          </Button>
-                        </Link>
                       </div>
-                    </CardContent>
-                  </Card>
+                      <CardContent className="p-6">
+                        <div className="mb-3">
+                          <h3 className="text-lg font-semibold text-keepr-green-700">{request.deviceType}</h3>
+                          <p className="text-keepr-green-600 text-sm">
+                            {request.brand} {request.model}
+                          </p>
+                        </div>
+                        <p className="text-keepr-green-600 mb-4 text-sm line-clamp-3">
+                          {request.description}
+                        </p>
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 text-keepr-green-500 mr-1" />
+                          <span className="text-xs text-keepr-green-600">{request.createdAt}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             ) : (
               <div className="text-center py-12">
-                <h3 className="text-xl font-semibold text-repair-green-700 mb-2">No Repair Requests Found</h3>
-                <p className="text-repair-green-600 mb-4">
+                <h3 className="text-xl font-semibold text-keepr-green-700 mb-2">No Repair Requests Found</h3>
+                <p className="text-keepr-green-600 mb-4">
                   We couldn't find any repair requests matching your search criteria.
                 </p>
                 <Button 
                   variant="outline" 
-                  className="text-repair-green-600 border-repair-green-300"
+                  className="btn-secondary"
                   onClick={() => {
                     setSearchQuery("");
                     setSelectedType("All Types");

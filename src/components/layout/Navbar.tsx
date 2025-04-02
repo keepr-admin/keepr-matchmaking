@@ -28,7 +28,6 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
           <Logo />
-          <span className="font-semibold text-xl text-keepr-green-600 hidden sm:inline">Keepr</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -39,19 +38,19 @@ const Navbar = () => {
           <Link to="/repair-requests" className="text-keepr-green-700 hover:text-keepr-green-500 font-medium">
             Browse Repairs
           </Link>
-          <Link to="/about" className="text-keepr-green-700 hover:text-keepr-green-500 font-medium">
+          <a href="/#about" className="text-keepr-green-700 hover:text-keepr-green-500 font-medium">
             About Us
-          </Link>
+          </a>
           <div className="flex gap-3">
             <Button 
-              variant="outline" 
-              className="bg-white text-keepr-green-600 border-keepr-green-400 hover:bg-keepr-green-50"
+              className="btn-primary"
               onClick={openRepairModal}
             >
               Request a Repair
             </Button>
             <Button 
-              className="bg-keepr-green-500 hover:bg-keepr-green-600 text-white"
+              variant="outline" 
+              className="btn-secondary"
               onClick={openHelpModal}
             >
               Help to Repair
@@ -87,16 +86,15 @@ const Navbar = () => {
             >
               Browse Repairs
             </Link>
-            <Link 
-              to="/about" 
+            <a 
+              href="/#about" 
               className="text-keepr-green-700 font-medium py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               About Us
-            </Link>
+            </a>
             <Button 
-              variant="outline" 
-              className="w-full justify-center bg-white text-keepr-green-600 border-keepr-green-400 hover:bg-keepr-green-50"
+              className="w-full justify-center btn-primary"
               onClick={() => {
                 openRepairModal();
                 setIsMenuOpen(false);
@@ -105,7 +103,8 @@ const Navbar = () => {
               Request a Repair
             </Button>
             <Button 
-              className="w-full justify-center bg-keepr-green-500 hover:bg-keepr-green-600 text-white"
+              variant="outline" 
+              className="w-full justify-center btn-secondary"
               onClick={() => {
                 openHelpModal();
                 setIsMenuOpen(false);
