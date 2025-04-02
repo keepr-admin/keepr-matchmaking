@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,23 +6,18 @@ import { ArrowRight, Wrench, Users, Calendar, Clock } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import AuthModal from "@/components/auth/AuthModal";
-
 const Index = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"repair" | "help">("repair");
-
   const openRepairModal = () => {
     setModalType("repair");
     setIsAuthModalOpen(true);
   };
-  
   const openHelpModal = () => {
     setModalType("help");
     setIsAuthModalOpen(true);
   };
-
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-grow">
@@ -38,29 +32,16 @@ const Index = () => {
               in their neighborhood. Save money, reduce waste, and build community!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-repair-green-500 hover:bg-repair-green-600 text-white"
-                onClick={openRepairModal}
-              >
+              <Button size="lg" className="bg-repair-green-500 hover:bg-repair-green-600 text-white" onClick={openRepairModal}>
                 Request a Repair
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="bg-white text-repair-green-600 border-repair-green-400 hover:bg-repair-green-50"
-                onClick={openHelpModal}
-              >
+              <Button size="lg" variant="outline" className="bg-white text-repair-green-600 border-repair-green-400 hover:bg-repair-green-50" onClick={openHelpModal}>
                 Help to Repair
               </Button>
             </div>
             
             <div className="mt-12 flex justify-center">
-              <img 
-                src="https://images.unsplash.com/photo-1581092921461-7d14b811c3d3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80" 
-                alt="People repairing devices" 
-                className="rounded-lg shadow-md max-w-full h-auto max-h-96"
-              />
+              <img src="https://images.unsplash.com/photo-1581092921461-7d14b811c3d3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80" alt="People repairing devices" className="rounded-lg shadow-md max-w-full h-auto max-h-96" />
             </div>
           </div>
         </section>
@@ -68,9 +49,7 @@ const Index = () => {
         {/* How It Works Section */}
         <section className="section bg-white">
           <div className="container mx-auto">
-            <h2 className="text-3xl font-bold text-center text-repair-green-700 mb-12">
-              How It Works
-            </h2>
+            <h2 className="text-3xl font-bold text-center text-repair-green-700 mb-12">How It Works?</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <Card className="border-repair-green-200 card-hover">
@@ -233,11 +212,7 @@ const Index = () => {
               Help reduce electronic waste by fixing broken devices. 
               Share your skills with others in your community.
             </p>
-            <Button 
-              size="lg" 
-              className="bg-white text-repair-green-600 hover:bg-repair-yellow-100"
-              onClick={openHelpModal}
-            >
+            <Button size="lg" className="bg-white text-repair-green-600 hover:bg-repair-yellow-100" onClick={openHelpModal}>
               Become a Repairer
             </Button>
           </div>
@@ -246,13 +221,7 @@ const Index = () => {
       
       <Footer />
       
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        type={modalType}
-      />
-    </div>
-  );
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} type={modalType} />
+    </div>;
 };
-
 export default Index;
