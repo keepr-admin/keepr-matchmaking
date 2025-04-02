@@ -49,7 +49,7 @@ const Index = () => {
         {/* How It Works Section */}
         <section className="section bg-white">
           <div className="container mx-auto">
-            <h2 className="text-3xl font-bold text-center text-repair-green-700 mb-12">How It Works?</h2>
+            <h2 className="text-3xl font-bold text-center text-repair-green-700 mb-12">How It Works</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <Card className="border-repair-green-200 card-hover">
