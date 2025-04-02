@@ -157,7 +157,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
           <Button
             type="submit"
-            className="w-full bg-repair-green-500 hover:bg-repair-green-600 text-white"
+            className="w-full bg-keepr-green-500 hover:bg-keepr-green-600 text-white"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Registering..." : "Register"}
@@ -166,11 +166,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       </Form>
 
       <div className="text-center mt-4">
-        <span className="text-repair-green-700">Already have an account?</span>{" "}
+        <span className="text-keepr-green-700">Already have an account?</span>{" "}
         <button
           type="button"
           onClick={onLoginClick}
-          className="text-repair-green-600 font-semibold hover:underline"
+          className="text-keepr-green-600 font-semibold hover:underline"
         >
           Login
         </button>

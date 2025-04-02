@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -14,7 +13,7 @@ import { Link } from "react-router-dom";
 import { 
   Settings, 
   Package, 
-  Tool, 
+  Wrench, 
   MessageSquare, 
   ChevronRight, 
   Clock, 
@@ -33,7 +32,6 @@ const Dashboard = () => {
   const [helpedRepairs, setHelpedRepairs] = useState<any[]>([]);
 
   useEffect(() => {
-    // Fetch user data
     const fetchUserData = async () => {
       setIsLoading(true);
       
@@ -41,12 +39,10 @@ const Dashboard = () => {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (!user) {
-          // Redirect to login if not authenticated
           window.location.href = "/auth";
           return;
         }
 
-        // Fetch profile
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -59,7 +55,6 @@ const Dashboard = () => {
           setProfile(profileData);
         }
 
-        // Fetch products
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select('*')
@@ -72,7 +67,6 @@ const Dashboard = () => {
           setProducts(productsData || []);
         }
 
-        // Fetch repair requests
         const { data: repairsData, error: repairsError } = await supabase
           .from('repair_requests')
           .select(`
@@ -88,7 +82,6 @@ const Dashboard = () => {
           setRepairRequests(repairsData || []);
         }
 
-        // Fetch repairs the user has helped with (only if user is a repairer)
         if (profileData?.receive_requests) {
           const { data: helpedData, error: helpedError } = await supabase
             .from('repair_requests')
@@ -131,7 +124,6 @@ const Dashboard = () => {
     }
   };
 
-  // Format date to a more readable format
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -186,7 +178,7 @@ const Dashboard = () => {
                 <span className="hidden sm:inline">Products</span>
               </TabsTrigger>
               <TabsTrigger value="repairs" className="data-[state=active]:bg-keepr-green-500 data-[state=active]:text-white">
-                <Tool className="mr-2 h-4 w-4" />
+                <Wrench className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Repair Requests</span>
               </TabsTrigger>
               <TabsTrigger value="messages" className="data-[state=active]:bg-keepr-green-500 data-[state=active]:text-white">
@@ -372,7 +364,7 @@ const Dashboard = () => {
                   <CardContent>
                     {repairRequests.length === 0 ? (
                       <div className="text-center py-8">
-                        <Tool className="mx-auto h-12 w-12 text-gray-400" />
+                        <Wrench className="mx-auto h-12 w-12 text-gray-400" />
                         <h3 className="mt-2 text-lg font-medium text-gray-900">No repair requests</h3>
                         <p className="mt-1 text-sm text-gray-500">
                           You haven't created any repair requests yet.

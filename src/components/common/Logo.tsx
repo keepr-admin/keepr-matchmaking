@@ -11,7 +11,8 @@ const Logo: React.FC<LogoProps> = ({ size = 28 }) => {
       <img 
         src="/logo.png" 
         alt="Keepr Logo" 
-        className="h-8 w-auto"
+        className={`w-auto`}
+        style={{ height: `${size}px` }}
       />
     </div>
   );

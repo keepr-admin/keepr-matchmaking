@@ -62,7 +62,7 @@ const VerificationForm: React.FC<VerificationFormProps> = ({
   return (
     <div className="space-y-4 py-2 pb-4">
       <div className="text-center mb-4">
-        <p className="text-repair-green-600">
+        <p className="text-keepr-green-600">
           We've sent a verification code to <strong>{email}</strong>. 
           Please enter the code below to verify your email.
         </p>
@@ -82,7 +82,7 @@ const VerificationForm: React.FC<VerificationFormProps> = ({
 
         <Button
           type="submit"
-          className="w-full bg-repair-green-500 hover:bg-repair-green-600 text-white"
+          className="w-full bg-keepr-green-500 hover:bg-keepr-green-600 text-white"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Verifying..." : "Verify Email"}
@@ -90,11 +90,11 @@ const VerificationForm: React.FC<VerificationFormProps> = ({
       </form>
 
       <div className="text-center mt-4">
-        <span className="text-repair-green-700">Didn't receive the code?</span>{" "}
+        <span className="text-keepr-green-700">Didn't receive the code?</span>{" "}
         <button
           type="button"
           onClick={handleResendCode}
-          className="text-repair-green-600 font-semibold hover:underline"
+          className="text-keepr-green-600 font-semibold hover:underline"
         >
           Resend Code
         </button>

@@ -103,7 +103,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
           <Button
             type="submit"
-            className="w-full bg-repair-green-500 hover:bg-repair-green-600 text-white"
+            className="w-full bg-keepr-green-500 hover:bg-keepr-green-600 text-white"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Logging in..." : "Login"}
@@ -112,11 +112,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
       </Form>
 
       <div className="text-center mt-4">
-        <span className="text-repair-green-700">Don't have an account?</span>{" "}
+        <span className="text-keepr-green-700">Don't have an account?</span>{" "}
         <button
           type="button"
           onClick={onRegisterClick}
-          className="text-repair-green-600 font-semibold hover:underline"
+          className="text-keepr-green-600 font-semibold hover:underline"
         >
           Register
         </button>
