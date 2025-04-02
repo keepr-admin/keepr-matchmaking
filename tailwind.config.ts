@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -65,11 +64,12 @@ export default {
 				},
 				// Custom color palette for Keepr
 				"keepr-green": {
+					50: "hsl(120, 50%, 97%)",
 					100: "hsl(120, 50%, 95%)",
 					200: "hsl(120, 50%, 90%)",
 					300: "hsl(120, 50%, 80%)",
 					400: "hsl(120, 60%, 40%)",
-					500: "hsl(120, 100%, 30%)", // Primary green
+					500: "hsl(120, 100%, 30%)",
 					600: "hsl(120, 100%, 24%)",
 					700: "hsl(120, 100%, 18%)",
 					800: "hsl(120, 100%, 12%)",
