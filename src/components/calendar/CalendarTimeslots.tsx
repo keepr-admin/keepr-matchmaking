@@ -33,6 +33,7 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [timeslots, setTimeslots] = useState<Timeslot[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [selectedTimeslots, setSelectedTimeslots] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -107,13 +108,18 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
         const endOfDay = new Date(selectedDate);
         endOfDay.setHours(23, 59, 59, 999);
 
-        const { data, error } = await supabase
+        let query = supabase
           .from('timeslots')
           .select('*')
           .gte('date_time', startOfDay.toISOString())
           .lte('date_time', endOfDay.toISOString())
-          .eq('available', true)
-          .order('date_time', { ascending: true });
+          .eq('available', true);
+          
+        if (selectedLocation) {
+          query = query.eq('location_id', selectedLocation);
+        }
+          
+        const { data, error } = await query.order('date_time', { ascending: true });
 
         if (error) {
           console.error('Error fetching timeslots:', error);
@@ -131,7 +137,7 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
     };
 
     fetchTimeslots();
-  }, [selectedDate]);
+  }, [selectedDate, selectedLocation]);
 
   // Toggle timeslot selection
   const toggleTimeslot = (timeslotId: string) => {
@@ -151,6 +157,13 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
     setSelectedTimeslots([]);
   };
 
+  // Handle location change
+  const handleLocationChange = (locationId: string) => {
+    setSelectedLocation(locationId === selectedLocation ? null : locationId);
+    // Clear selected timeslots when changing location
+    setSelectedTimeslots([]);
+  };
+
   // Handle submit
   const handleSubmit = () => {
     onTimeslotsSelected(selectedTimeslots);
@@ -165,6 +178,43 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
   // Check if a date has available timeslots (for dot indicator)
   const isDateAvailable = (date: Date) => {
     return availableDates.some(availableDate => isSameDay(availableDate, date));
+  };
+
+  // Get location description based on name
+  const getLocationDescription = (locationName: string) => {
+    if (locationName.includes("Herstel Hub")) {
+      return (
+        <div className="p-4 bg-keepr-green-50 rounded-lg mt-4 text-sm text-keepr-green-700">
+          <h4 className="font-medium mb-2">About Herstel Hub Elektro:</h4>
+          <ol className="list-decimal pl-5 space-y-1">
+            <li>Register for a time slot</li>
+            <li>Come to Maakleerplek with your device at the scheduled time</li>
+            <li>We ask for a voluntary contribution for this service</li>
+          </ol>
+          <p className="mt-2">
+            Herstel Hub Elektro is open once a week from 5 PM to 9 PM. 
+            Within a 1-hour time slot, we will try to repair your device. 
+            If that's not possible, we'll provide advice or discuss what else can be done.
+          </p>
+        </div>
+      );
+    } else if (locationName.includes("Repair Café")) {
+      return (
+        <div className="p-4 bg-keepr-green-50 rounded-lg mt-4 text-sm text-keepr-green-700">
+          <h4 className="font-medium mb-2">About Repair Café:</h4>
+          <p>
+            Every 3rd Saturday of the month, we organize a Repair Café in the canteen of Maakleerplek.
+          </p>
+          <p className="mt-2">
+            To reduce waiting times, we try to work with 3 time slots of 1 hour each, during which we admit a number of visitors.
+          </p>
+          <p className="mt-2">
+            Please note, we cannot always guarantee that you will be helped within this hour, but we do our best.
+          </p>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -218,6 +268,27 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
                 }}
               />
             </TooltipProvider>
+            
+            {locations.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-sm font-medium mb-2">Filter by location:</h3>
+                <div className="flex flex-col space-y-2">
+                  {locations.map((location) => (
+                    <Button
+                      key={location.location_id}
+                      variant={selectedLocation === location.location_id ? "default" : "outline"}
+                      className={cn(
+                        "justify-start",
+                        selectedLocation === location.location_id ? "bg-keepr-green-500" : ""
+                      )}
+                      onClick={() => handleLocationChange(location.location_id)}
+                    >
+                      {location.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <div className="md:col-span-2">
             <div className="space-y-4">
@@ -240,36 +311,47 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
                       No available timeslots for this date.
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {timeslots.map((slot) => {
-                        const isSelected = selectedTimeslots.includes(slot.timeslot_id);
-                        return (
-                          <Button
-                            key={slot.timeslot_id}
-                            variant={isSelected ? "default" : "outline"}
-                            className={cn(
-                              "justify-start text-left h-auto py-3 px-4",
-                              isSelected ? "bg-keepr-green-500 text-white hover:bg-keepr-green-600" : "hover:border-keepr-green-500 hover:text-keepr-green-500"
-                            )}
-                            onClick={() => toggleTimeslot(slot.timeslot_id)}
-                          >
-                            <div className="flex flex-col">
-                              <span className="font-medium">{format(new Date(slot.date_time), 'h:mm a')}</span>
-                              <span className="text-sm">{getLocationName(slot.location_id)}</span>
-                            </div>
-                          </Button>
-                        );
-                      })}
-                    </div>
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {timeslots.map((slot) => {
+                          const isSelected = selectedTimeslots.includes(slot.timeslot_id);
+                          const locationName = getLocationName(slot.location_id);
+                          return (
+                            <Button
+                              key={slot.timeslot_id}
+                              variant={isSelected ? "default" : "outline"}
+                              className={cn(
+                                "justify-start text-left h-auto py-3 px-4",
+                                isSelected ? "bg-keepr-green-500 text-white hover:bg-keepr-green-600" : "hover:border-keepr-green-500 hover:text-keepr-green-500"
+                              )}
+                              onClick={() => toggleTimeslot(slot.timeslot_id)}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">{format(new Date(slot.date_time), 'h:mm a')}</span>
+                                <span className="text-sm">{locationName}</span>
+                              </div>
+                            </Button>
+                          );
+                        })}
+                      </div>
+
+                      {selectedTimeslots.length > 0 && (
+                        <div className="mt-4 text-sm">
+                          <p className="text-keepr-green-700">
+                            You've selected {selectedTimeslots.length} timeslot{selectedTimeslots.length !== 1 ? 's' : ''}.
+                          </p>
+                        </div>
+                      )}
+                      
+                      {selectedTimeslots.length > 0 && selectedTimeslots.length === 1 && (
+                        <>
+                          {getLocationDescription(getLocationName(timeslots.find(slot => 
+                            slot.timeslot_id === selectedTimeslots[0]
+                          )?.location_id || ""))}
+                        </>
+                      )}
+                    </>
                   )}
-                  
-                  <div className="mt-4 text-sm">
-                    {selectedTimeslots.length > 0 && (
-                      <p className="text-keepr-green-700">
-                        You've selected {selectedTimeslots.length} timeslot{selectedTimeslots.length !== 1 ? 's' : ''}.
-                      </p>
-                    )}
-                  </div>
                 </>
               )}
             </div>

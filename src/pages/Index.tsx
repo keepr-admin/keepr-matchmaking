@@ -22,7 +22,8 @@ const Index = () => {
     setIsAuthModalOpen(true);
   };
   
-  return <div className="min-h-screen flex flex-col">
+  return (
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-grow">
@@ -46,7 +47,16 @@ const Index = () => {
             </div>
             
             <div className="mt-12 flex justify-center">
-              <img src="/hero-image.jpg" alt="People repairing devices" className="rounded-lg shadow-md max-w-full h-auto max-h-96" />
+              <img 
+                src="/hero-image.jpg" 
+                alt="People repairing devices" 
+                className="rounded-lg shadow-md max-w-full h-auto max-h-96"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/placeholder.svg";
+                  target.onerror = null;
+                }} 
+              />
             </div>
           </div>
         </section>
@@ -120,7 +130,7 @@ const Index = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Sample Repair Cards - These would be dynamically generated */}
-              <Link to="/repair-requests/1">
+              <Link to="/repair-requests/1" className="block h-full">
                 <Card className="border-keepr-green-200 card-hover h-full">
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start mb-3">
@@ -143,7 +153,7 @@ const Index = () => {
                 </Card>
               </Link>
               
-              <Link to="/repair-requests/2">
+              <Link to="/repair-requests/2" className="block h-full">
                 <Card className="border-keepr-green-200 card-hover h-full">
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start mb-3">
@@ -166,7 +176,7 @@ const Index = () => {
                 </Card>
               </Link>
               
-              <Link to="/repair-requests/3">
+              <Link to="/repair-requests/3" className="block h-full">
                 <Card className="border-keepr-green-200 card-hover h-full">
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start mb-3">
@@ -294,7 +304,8 @@ const Index = () => {
       <Footer />
       
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} type={modalType} />
-    </div>;
+    </div>
+  );
 };
 
 export default Index;

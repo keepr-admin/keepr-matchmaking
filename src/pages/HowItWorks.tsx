@@ -49,7 +49,7 @@ const HowItWorks = () => {
         </section>
 
         {/* For People Needing Repairs */}
-        <section id="for-people-needing-repairs" className="section bg-white">
+        <section id="for-people-needing-repairs" className="section bg-white pt-24 -mt-12">
           <div className="container mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-keepr-green-700 mb-8 text-center">
               For People Needing Repairs
@@ -61,6 +61,11 @@ const HowItWorks = () => {
                   src="/elderly-with-device.jpg" 
                   alt="Elderly person with broken device" 
                   className="rounded-lg shadow-md w-full h-auto"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/placeholder.svg";
+                    target.onerror = null;
+                  }}
                 />
               </div>
               
@@ -143,7 +148,7 @@ const HowItWorks = () => {
         </section>
 
         {/* For Volunteer Repairers */}
-        <section id="for-volunteer-repairers" className="section bg-keepr-green-50">
+        <section id="for-volunteer-repairers" className="section bg-keepr-green-50 pt-24 -mt-12">
           <div className="container mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-keepr-green-700 mb-8 text-center">
               For Volunteer Repairers
@@ -222,6 +227,11 @@ const HowItWorks = () => {
                   src="/repair-cafe.jpg" 
                   alt="Person repairing a device in a repair café" 
                   className="rounded-lg shadow-md w-full h-auto"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/placeholder.svg";
+                    target.onerror = null;
+                  }}
                 />
               </div>
             </div>
