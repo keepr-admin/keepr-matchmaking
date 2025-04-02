@@ -28,30 +28,30 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
           <Logo />
-          <span className="font-semibold text-xl text-repair-green-600 hidden sm:inline">RepairBuddies</span>
+          <span className="font-semibold text-xl text-keepr-green-600 hidden sm:inline">Keepr</span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
-          <Link to="/how-it-works" className="text-repair-green-700 hover:text-repair-green-500 font-medium">
+          <Link to="/how-it-works" className="text-keepr-green-700 hover:text-keepr-green-500 font-medium">
             How It Works
           </Link>
-          <Link to="/repair-requests" className="text-repair-green-700 hover:text-repair-green-500 font-medium">
+          <Link to="/repair-requests" className="text-keepr-green-700 hover:text-keepr-green-500 font-medium">
             Browse Repairs
           </Link>
-          <Link to="/about" className="text-repair-green-700 hover:text-repair-green-500 font-medium">
+          <Link to="/about" className="text-keepr-green-700 hover:text-keepr-green-500 font-medium">
             About Us
           </Link>
           <div className="flex gap-3">
             <Button 
               variant="outline" 
-              className="bg-white text-repair-green-600 border-repair-green-400 hover:bg-repair-green-50"
+              className="bg-white text-keepr-green-600 border-keepr-green-400 hover:bg-keepr-green-50"
               onClick={openRepairModal}
             >
               Request a Repair
             </Button>
             <Button 
-              className="bg-repair-green-500 hover:bg-repair-green-600 text-white"
+              className="bg-keepr-green-500 hover:bg-keepr-green-600 text-white"
               onClick={openHelpModal}
             >
               Help to Repair
@@ -61,7 +61,7 @@ const Navbar = () => {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-repair-green-700 p-2"
+          className="md:hidden text-keepr-green-700 p-2"
           onClick={toggleMenu}
           aria-label="Toggle menu"
         >
@@ -75,28 +75,28 @@ const Navbar = () => {
           <div className="flex flex-col space-y-4">
             <Link 
               to="/how-it-works" 
-              className="text-repair-green-700 font-medium py-2"
+              className="text-keepr-green-700 font-medium py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               How It Works
             </Link>
             <Link 
               to="/repair-requests" 
-              className="text-repair-green-700 font-medium py-2"
+              className="text-keepr-green-700 font-medium py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Browse Repairs
             </Link>
             <Link 
               to="/about" 
-              className="text-repair-green-700 font-medium py-2"
+              className="text-keepr-green-700 font-medium py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               About Us
             </Link>
             <Button 
               variant="outline" 
-              className="w-full justify-center bg-white text-repair-green-600 border-repair-green-400 hover:bg-repair-green-50"
+              className="w-full justify-center bg-white text-keepr-green-600 border-keepr-green-400 hover:bg-keepr-green-50"
               onClick={() => {
                 openRepairModal();
                 setIsMenuOpen(false);
@@ -105,7 +105,7 @@ const Navbar = () => {
               Request a Repair
             </Button>
             <Button 
-              className="w-full justify-center bg-repair-green-500 hover:bg-repair-green-600 text-white"
+              className="w-full justify-center bg-keepr-green-500 hover:bg-keepr-green-600 text-white"
               onClick={() => {
                 openHelpModal();
                 setIsMenuOpen(false);

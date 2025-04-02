@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -27,6 +28,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Image, Upload } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { supabase } from "@/integrations/supabase/client";
 
 // Sample data for device types
 const deviceTypes = [
@@ -59,6 +61,7 @@ const NewRepairRequest = () => {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -131,21 +134,16 @@ const NewRepairRequest = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call to create repair request
+      // In a real app, you would upload images and create the repair request using Supabase
       console.log("Form values:", values);
       console.log("Images:", images);
       
-      // In a real app, you would upload images and create the repair request
-      
+      // For demo purposes, simulate API call
       setTimeout(() => {
         setIsSubmitting(false);
-        toast({
-          title: "Repair request submitted!",
-          description: "We'll notify you when a repairer is available.",
-        });
         
-        // Redirect to success page or calendar selection
-        window.location.href = "/repair-request-timeslots";
+        // Redirect to timeslot selection
+        navigate("/repair-request-timeslots");
       }, 1500);
       
     } catch (error) {
@@ -165,12 +163,12 @@ const NewRepairRequest = () => {
       
       <main className="flex-grow">
         {/* Header Section */}
-        <section className="bg-repair-green-100 py-12 px-4 md:px-8">
+        <section className="bg-keepr-green-100 py-12 px-4 md:px-8">
           <div className="container mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-repair-green-800 mb-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-keepr-green-800 mb-4 text-center">
               Submit a Repair Request
             </h1>
-            <p className="text-lg text-repair-green-700 max-w-2xl mx-auto text-center mb-2">
+            <p className="text-lg text-keepr-green-700 max-w-2xl mx-auto text-center mb-2">
               Tell us about your broken device so we can match you with the right repairer.
             </p>
           </div>
@@ -179,7 +177,7 @@ const NewRepairRequest = () => {
         {/* Form Section */}
         <section className="section bg-white">
           <div className="container mx-auto max-w-3xl">
-            <Card className="border-repair-green-200">
+            <Card className="border-keepr-green-200">
               <CardContent className="p-6 md:p-8">
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -272,13 +270,13 @@ const NewRepairRequest = () => {
                       <FormLabel>Photos</FormLabel>
                       <div className="mt-2 mb-4">
                         <div className="flex items-center justify-center w-full">
-                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer border-repair-green-300 bg-repair-green-50 hover:bg-repair-green-100">
+                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer border-keepr-green-300 bg-keepr-green-50 hover:bg-keepr-green-100">
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <Upload className="w-8 h-8 mb-2 text-repair-green-500" />
-                              <p className="mb-2 text-sm text-repair-green-600">
+                              <Upload className="w-8 h-8 mb-2 text-keepr-green-500" />
+                              <p className="mb-2 text-sm text-keepr-green-600">
                                 <span className="font-semibold">Click to upload</span> or drag and drop
                               </p>
-                              <p className="text-xs text-repair-green-500">
+                              <p className="text-xs text-keepr-green-500">
                                 Upload photos of your device and the malfunction
                               </p>
                             </div>
@@ -320,7 +318,7 @@ const NewRepairRequest = () => {
                     
                     <Button
                       type="submit"
-                      className="w-full bg-repair-green-500 hover:bg-repair-green-600 text-white mt-6"
+                      className="w-full bg-keepr-green-500 hover:bg-keepr-green-600 text-white mt-6"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? "Submitting..." : "Continue to Schedule"}

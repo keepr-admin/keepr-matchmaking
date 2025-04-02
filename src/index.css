@@ -1,52 +1,57 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 100 33% 98%;
-    --foreground: 144 10% 19%;
+    --background: 120 33% 98%;
+    --foreground: 120 10% 19%;
 
     --card: 0 0% 100%;
-    --card-foreground: 144 10% 19%;
+    --card-foreground: 120 10% 19%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 144 10% 19%;
+    --popover-foreground: 120 10% 19%;
 
-    --primary: 144 32% 48%;
+    --primary: 120 100% 29.4%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 48 100% 78%;
-    --secondary-foreground: 144 10% 19%;
+    --secondary-foreground: 120 10% 19%;
 
-    --muted: 144 10% 90%;
-    --muted-foreground: 144 7% 40%;
+    --muted: 120 10% 90%;
+    --muted-foreground: 120 7% 40%;
 
     --accent: 48 100% 78%;
-    --accent-foreground: 144 10% 19%;
+    --accent-foreground: 120 10% 19%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 144 10% 84%;
-    --input: 144 10% 84%;
-    --ring: 144 32% 48%;
+    --border: 120 10% 84%;
+    --input: 120 10% 84%;
+    --ring: 120 100% 29.4%;
 
     --radius: 0.75rem;
   }
 
   * {
     @apply border-border;
+    font-family: 'Outfit', sans-serif;
   }
 
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Outfit', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold text-foreground;
+    font-family: 'Outfit', sans-serif;
   }
 
   h1 {
@@ -68,7 +73,7 @@
 
 @layer components {
   .hero-section {
-    @apply py-16 px-4 md:px-8 lg:px-12 bg-gradient-to-b from-repair-green-100 to-repair-yellow-100;
+    @apply py-16 px-4 md:px-8 lg:px-12 bg-gradient-to-b from-keepr-green-100 to-keepr-yellow-100;
   }
 
   .section {

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,19 +62,19 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom color palette
-				"repair-green": {
-					100: "#E8F5E4",
-					200: "#D1EBCA",
-					300: "#B5E6A1",
-					400: "#8CC084",
-					500: "#68A454",
-					600: "#4D7F3D",
-					700: "#355C29",
-					800: "#1F3918",
-					900: "#0A1308"
+				// Custom color palette for Keepr
+				"keepr-green": {
+					100: "#E6F4E6",
+					200: "#C2E3C2",
+					300: "#8FCC8F",
+					400: "#4AA64A",
+					500: "#029600", // RGB(2,150,0)
+					600: "#017800",
+					700: "#015A00",
+					800: "#003C00",
+					900: "#001E00"
 				},
-				"repair-yellow": {
+				"keepr-yellow": {
 					100: "#FFFDE6",
 					200: "#FFFA9D",
 					300: "#FFF677",

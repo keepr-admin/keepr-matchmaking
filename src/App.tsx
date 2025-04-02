@@ -10,6 +10,7 @@ import RepairRequests from "./pages/RepairRequests";
 import NewRepairRequest from "./pages/NewRepairRequest";
 import RepairRequestTimeslots from "./pages/RepairRequestTimeslots";
 import RepairRequestConfirmation from "./pages/RepairRequestConfirmation";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/new-repair-request" element={<NewRepairRequest />} />
           <Route path="/repair-request-timeslots" element={<RepairRequestTimeslots />} />
           <Route path="/repair-request-confirmation" element={<RepairRequestConfirmation />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
