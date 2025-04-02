@@ -9,6 +9,8 @@ import {
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import VerificationForm from "./VerificationForm";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -21,6 +23,7 @@ type AuthStep = "login" | "register" | "verify";
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type }) => {
   const [step, setStep] = useState<AuthStep>("register");
   const [email, setEmail] = useState("");
+  const { toast } = useToast();
 
   const handleLoginClick = () => {
     setStep("login");
@@ -33,10 +36,42 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type }) => {
   const handleRegisterSuccess = (userEmail: string) => {
     setEmail(userEmail);
     setStep("verify");
+    toast({
+      title: "Registration successful",
+      description: "Please verify your email to continue.",
+    });
   };
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = async () => {
+    // Get the current session
+    const { data, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error("Session error:", error);
+      toast({
+        title: "Authentication error",
+        description: "There was a problem with your login. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!data.session) {
+      toast({
+        title: "Login failed",
+        description: "No session found. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    toast({
+      title: "Login successful",
+      description: "You have been logged in successfully.",
+    });
+    
     onClose();
+    
     // Redirect based on the type
     if (type === "repair") {
       window.location.href = "/new-repair-request";
@@ -45,8 +80,36 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type }) => {
     }
   };
 
-  const handleVerificationSuccess = () => {
+  const handleVerificationSuccess = async () => {
+    // Check if the user is already verified
+    const { data, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error("Session error:", error);
+      toast({
+        title: "Verification error",
+        description: "There was a problem verifying your account. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!data.session) {
+      toast({
+        title: "Verification failed",
+        description: "No session found. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    toast({
+      title: "Verification successful",
+      description: "Your email has been verified. You are now logged in.",
+    });
+    
     onClose();
+    
     // Redirect based on the type
     if (type === "repair") {
       window.location.href = "/new-repair-request";

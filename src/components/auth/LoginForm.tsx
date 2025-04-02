@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -48,21 +49,36 @@ const LoginForm: React.FC<LoginFormProps> = ({
     setIsSubmitting(true);
     
     try {
-      // In a real app, you would make an API call to authenticate the user
-      // For now, we'll simulate the process
-      console.log("Login values:", values);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
       
-      // Simulate login
-      setTimeout(() => {
+      if (error) {
+        console.error("Login error:", error);
+        toast({
+          title: "Login failed",
+          description: error.message || "Invalid email or password. Please try again.",
+          variant: "destructive",
+        });
         setIsSubmitting(false);
-        onLoginSuccess();
-      }, 1000);
+        return;
+      }
+      
+      console.log("Login successful:", data);
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      
+      setIsSubmitting(false);
+      onLoginSuccess();
       
     } catch (error) {
       console.error("Login error:", error);
       toast({
         title: "Login failed",
-        description: "Invalid email or password. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
       setIsSubmitting(false);

@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Form,
@@ -15,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -25,6 +25,9 @@ const formSchema = z.object({
   }),
   email: z.string().email({
     message: "Please enter a valid email address.",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
   }),
   postalCode: z.string().min(4, {
     message: "Please enter a valid postal code.",
@@ -51,6 +54,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       firstName: "",
       lastName: "",
       email: "",
+      password: "",
       postalCode: "",
     },
   });
@@ -59,10 +63,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     setIsSubmitting(true);
     
     try {
-      // In a real app, you would make an API call to create the user
-      // For now, we'll simulate the process
-      console.log("Registration values:", values);
-      
       // Check if postal code is in Leuven (3000-3012)
       const postalCode = parseInt(values.postalCode);
       const isLeuven = postalCode >= 3000 && postalCode <= 3012;
@@ -77,17 +77,63 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         return;
       }
       
-      // Simulate sending verification email
-      setTimeout(() => {
+      // Register the user with Supabase
+      const { data, error } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+        options: {
+          data: {
+            first_name: values.firstName,
+            last_name: values.lastName,
+            postal_code: values.postalCode,
+            receive_requests: type === "help", // Set receive_requests to true if they want to help
+          },
+        },
+      });
+      
+      if (error) {
+        console.error("Registration error:", error);
+        toast({
+          title: "Registration failed",
+          description: error.message || "There was a problem with your registration. Please try again.",
+          variant: "destructive",
+        });
         setIsSubmitting(false);
-        onRegisterSuccess(values.email);
-      }, 1000);
+        return;
+      }
+      
+      console.log("Registration successful:", data);
+      
+      // Update the profile with additional data
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            first_name: values.firstName,
+            last_name: values.lastName,
+            postal_code: values.postalCode,
+            receive_requests: type === "help",
+          })
+          .eq('id', data.user.id);
+          
+        if (profileError) {
+          console.error("Error updating profile:", profileError);
+        }
+      }
+      
+      toast({
+        title: "Registration successful",
+        description: "Your account has been created. Please verify your email.",
+      });
+      
+      setIsSubmitting(false);
+      onRegisterSuccess(values.email);
       
     } catch (error) {
       console.error("Registration error:", error);
       toast({
         title: "Registration failed",
-        description: "There was a problem with your registration. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
       setIsSubmitting(false);
@@ -135,6 +181,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="john.doe@example.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="••••••" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

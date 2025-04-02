@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import PopulateDemoData from "../demo/PopulateDemoData";
 
 const profileFormSchema = z.object({
   first_name: z.string().min(1, { message: "First name is required" }),
@@ -59,6 +60,7 @@ const Profile = () => {
         
         if (!user) {
           console.error("No authenticated user");
+          setLoading(false);
           return;
         }
         
@@ -70,6 +72,7 @@ const Profile = () => {
           
         if (error) {
           console.error("Error fetching profile:", error);
+          setLoading(false);
           return;
         }
         
@@ -306,6 +309,19 @@ const Profile = () => {
               </Button>
             </form>
           </Form>
+        </CardContent>
+      </Card>
+      
+      {/* Add the demo data population button */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Demo Data</CardTitle>
+          <CardDescription>
+            Populate your account with demo data for testing purposes.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <PopulateDemoData />
         </CardContent>
       </Card>
     </div>
