@@ -27,16 +27,26 @@ import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
+  const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   
   useEffect(() => {
+    // Set up auth state listener first
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user || null);
+      setLoading(false);
+    });
+    
+    // Then check for existing session
     const checkUser = async () => {
       try {
-        const { data } = await supabase.auth.getUser();
-        setUser(data.user);
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user || null);
       } catch (error) {
         console.error("Error getting user:", error);
       } finally {
@@ -45,14 +55,6 @@ const Dashboard = () => {
     };
     
     checkUser();
-    
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN") {
-        setUser(session?.user || null);
-      } else if (event === "SIGNED_OUT") {
-        setUser(null);
-      }
-    });
     
     return () => {
       authListener.subscription.unsubscribe();
@@ -112,7 +114,6 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen flex-col">
-      {/* Remove the hideMenu prop since it doesn't exist on Navbar */}
       <Navbar />
       
       <div className="flex flex-1 overflow-hidden">

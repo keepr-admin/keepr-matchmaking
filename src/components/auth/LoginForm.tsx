@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -36,6 +37,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,6 +75,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
       
       setIsSubmitting(false);
       onLoginSuccess();
+      
+      // Redirect to dashboard
+      navigate("/dashboard");
       
     } catch (error) {
       console.error("Login error:", error);
