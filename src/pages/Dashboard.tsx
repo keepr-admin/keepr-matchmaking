@@ -112,7 +112,8 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen flex-col">
-      <Navbar hideMenu={true} />
+      {/* Remove the hideMenu prop since it doesn't exist on Navbar */}
+      <Navbar />
       
       <div className="flex flex-1 overflow-hidden">
         {/* Mobile Sidebar Toggle */}

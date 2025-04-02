@@ -64,7 +64,8 @@ const RepairRequestsList = () => {
         }
         
         if (data) {
-          setRepairRequests(data as RepairRequestWithDetails[]);
+          // Type assertion to fix the TypeScript error
+          setRepairRequests(data as unknown as RepairRequestWithDetails[]);
         }
       } catch (error) {
         console.error('Error in fetchRepairRequests:', error);
