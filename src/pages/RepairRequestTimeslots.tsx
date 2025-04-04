@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
@@ -71,12 +72,21 @@ const RepairRequestTimeslots = () => {
       <Navbar />
       
       <main className="flex-grow">
+        {/* Header Section */}
+        <section className="bg-keepr-green-100 py-12 px-4 md:px-8">
+          <div className="container mx-auto">
+            <h1 className="text-3xl md:text-4xl font-bold text-keepr-green-800 mb-4 text-center">
+              Submit a Repair Request
+            </h1>
+            <p className="text-lg text-keepr-green-700 max-w-2xl mx-auto text-center mb-2">
+              Choose from available dates and times for your repair
+            </p>
+          </div>
+        </section>
+        
         {/* Calendar Section */}
         <section className="py-8 px-4 md:px-8">
           <div className="container mx-auto">
-            
-            
-            
             <CalendarTimeslots onTimeslotsSelected={handleTimeslotsSelected} selectedLocationId={selectedLocation} locations={locations} onLocationChange={setSelectedLocation} loading={loading} />
             
             {isSubmitting && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
