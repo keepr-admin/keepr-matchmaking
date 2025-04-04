@@ -20,32 +20,43 @@ import { cn } from "@/lib/utils";
 import { format, isSameDay } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
+import { Info, Users } from "lucide-react";
 
 type Timeslot = Tables<"timeslots">;
 type Location = Tables<"locations">;
 
 interface CalendarTimeslotsProps {
   onTimeslotsSelected: (selectedTimeslots: string[]) => void;
+  selectedLocationId?: string | null;
 }
 
-const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelected }) => {
+const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ 
+  onTimeslotsSelected, 
+  selectedLocationId 
+}) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [timeslots, setTimeslots] = useState<Timeslot[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [selectedTimeslots, setSelectedTimeslots] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
 
-  // Fetch available dates
+  // Fetch available dates based on selected location
   useEffect(() => {
     const fetchAvailableDates = async () => {
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('timeslots')
           .select('date_time')
           .eq('available', true)
           .order('date_time', { ascending: true });
+          
+        if (selectedLocationId) {
+          query = query.eq('location_id', selectedLocationId);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           console.error('Error fetching available dates:', error);
@@ -68,7 +79,7 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
     };
 
     fetchAvailableDates();
-  }, []);
+  }, [selectedLocationId]);
 
   // Fetch locations
   useEffect(() => {
@@ -94,7 +105,17 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
     fetchLocations();
   }, []);
 
-  // Fetch timeslots for selected date
+  // Update current location when selectedLocationId changes
+  useEffect(() => {
+    if (selectedLocationId && locations.length > 0) {
+      const location = locations.find(loc => loc.location_id === selectedLocationId);
+      setCurrentLocation(location || null);
+    } else {
+      setCurrentLocation(null);
+    }
+  }, [selectedLocationId, locations]);
+
+  // Fetch timeslots for selected date and location
   useEffect(() => {
     const fetchTimeslots = async () => {
       if (!selectedDate) return;
@@ -115,8 +136,8 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
           .lte('date_time', endOfDay.toISOString())
           .eq('available', true);
           
-        if (selectedLocation) {
-          query = query.eq('location_id', selectedLocation);
+        if (selectedLocationId) {
+          query = query.eq('location_id', selectedLocationId);
         }
           
         const { data, error } = await query.order('date_time', { ascending: true });
@@ -137,7 +158,7 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
     };
 
     fetchTimeslots();
-  }, [selectedDate, selectedLocation]);
+  }, [selectedDate, selectedLocationId]);
 
   // Toggle timeslot selection
   const toggleTimeslot = (timeslotId: string) => {
@@ -157,13 +178,6 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
     setSelectedTimeslots([]);
   };
 
-  // Handle location change
-  const handleLocationChange = (locationId: string) => {
-    setSelectedLocation(locationId === selectedLocation ? null : locationId);
-    // Clear selected timeslots when changing location
-    setSelectedTimeslots([]);
-  };
-
   // Handle submit
   const handleSubmit = () => {
     onTimeslotsSelected(selectedTimeslots);
@@ -180,43 +194,6 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
     return availableDates.some(availableDate => isSameDay(availableDate, date));
   };
 
-  // Get location description based on name
-  const getLocationDescription = (locationName: string) => {
-    if (locationName.includes("Herstel Hub")) {
-      return (
-        <div className="p-4 bg-keepr-green-50 rounded-lg mt-4 text-sm text-keepr-green-700">
-          <h4 className="font-medium mb-2">About Herstel Hub Elektro:</h4>
-          <ol className="list-decimal pl-5 space-y-1">
-            <li>Register for a time slot</li>
-            <li>Come to Maakleerplek with your device at the scheduled time</li>
-            <li>We ask for a voluntary contribution for this service</li>
-          </ol>
-          <p className="mt-2">
-            Herstel Hub Elektro is open once a week from 5 PM to 9 PM. 
-            Within a 1-hour time slot, we will try to repair your device. 
-            If that's not possible, we'll provide advice or discuss what else can be done.
-          </p>
-        </div>
-      );
-    } else if (locationName.includes("Repair Café")) {
-      return (
-        <div className="p-4 bg-keepr-green-50 rounded-lg mt-4 text-sm text-keepr-green-700">
-          <h4 className="font-medium mb-2">About Repair Café:</h4>
-          <p>
-            Every 3rd Saturday of the month, we organize a Repair Café in the canteen of Maakleerplek.
-          </p>
-          <p className="mt-2">
-            To reduce waiting times, we try to work with 3 time slots of 1 hour each, during which we admit a number of visitors.
-          </p>
-          <p className="mt-2">
-            Please note, we cannot always guarantee that you will be helped within this hour, but we do our best.
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
@@ -224,6 +201,18 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
         <CardDescription>Choose from available dates and times for your repair</CardDescription>
       </CardHeader>
       <CardContent>
+        {currentLocation && currentLocation.description && (
+          <div className="p-4 bg-keepr-green-50 rounded-lg mb-6 text-sm text-keepr-green-700">
+            <div className="flex items-start">
+              <Info className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0 text-keepr-green-600" />
+              <div>
+                <h4 className="font-medium mb-2">About {currentLocation.name}:</h4>
+                <div className="whitespace-pre-line">{currentLocation.description}</div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
             <TooltipProvider>
@@ -268,28 +257,8 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
                 }}
               />
             </TooltipProvider>
-            
-            {locations.length > 0 && (
-              <div className="mt-6">
-                <h3 className="text-sm font-medium mb-2">Filter by location:</h3>
-                <div className="flex flex-col space-y-2">
-                  {locations.map((location) => (
-                    <Button
-                      key={location.location_id}
-                      variant={selectedLocation === location.location_id ? "default" : "outline"}
-                      className={cn(
-                        "justify-start",
-                        selectedLocation === location.location_id ? "bg-keepr-green-500" : ""
-                      )}
-                      onClick={() => handleLocationChange(location.location_id)}
-                    >
-                      {location.name}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
+          
           <div className="md:col-span-2">
             <div className="space-y-4">
               <h3 className="text-lg font-medium">
@@ -308,7 +277,9 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
                 <>
                   {timeslots.length === 0 ? (
                     <div className="text-center py-12 text-muted-foreground">
-                      No available timeslots for this date.
+                      {selectedLocationId 
+                        ? "No available timeslots for this date at the selected location."
+                        : "No available timeslots for this date. Please select a location or try another date."}
                     </div>
                   ) : (
                     <>
@@ -316,18 +287,29 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
                         {timeslots.map((slot) => {
                           const isSelected = selectedTimeslots.includes(slot.timeslot_id);
                           const locationName = getLocationName(slot.location_id);
+                          const availableSpots = slot.capacity - slot.spots_taken;
+                          const isFull = availableSpots <= 0;
+                          
                           return (
                             <Button
                               key={slot.timeslot_id}
                               variant={isSelected ? "default" : "outline"}
                               className={cn(
                                 "justify-start text-left h-auto py-3 px-4",
-                                isSelected ? "bg-keepr-green-500 text-white hover:bg-keepr-green-600" : "hover:border-keepr-green-500 hover:text-keepr-green-500"
+                                isSelected ? "bg-keepr-green-500 text-white hover:bg-keepr-green-600" : "hover:border-keepr-green-500 hover:text-keepr-green-500",
+                                isFull && "opacity-50 cursor-not-allowed"
                               )}
-                              onClick={() => toggleTimeslot(slot.timeslot_id)}
+                              onClick={() => !isFull && toggleTimeslot(slot.timeslot_id)}
+                              disabled={isFull}
                             >
-                              <div className="flex flex-col">
-                                <span className="font-medium">{format(new Date(slot.date_time), 'h:mm a')}</span>
+                              <div className="flex flex-col w-full">
+                                <div className="flex justify-between items-center w-full">
+                                  <span className="font-medium">{format(new Date(slot.date_time), 'h:mm a')}</span>
+                                  <div className="flex items-center text-xs">
+                                    <Users className="h-3 w-3 mr-1" />
+                                    <span>{availableSpots} / {slot.capacity} spots</span>
+                                  </div>
+                                </div>
                                 <span className="text-sm">{locationName}</span>
                               </div>
                             </Button>
@@ -341,14 +323,6 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({ onTimeslotsSelect
                             You've selected {selectedTimeslots.length} timeslot{selectedTimeslots.length !== 1 ? 's' : ''}.
                           </p>
                         </div>
-                      )}
-                      
-                      {selectedTimeslots.length > 0 && selectedTimeslots.length === 1 && (
-                        <>
-                          {getLocationDescription(getLocationName(timeslots.find(slot => 
-                            slot.timeslot_id === selectedTimeslots[0]
-                          )?.location_id || ""))}
-                        </>
                       )}
                     </>
                   )}

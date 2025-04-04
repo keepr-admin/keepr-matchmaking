@@ -276,28 +276,43 @@ export type Database = {
       timeslots: {
         Row: {
           available: boolean
+          capacity: number
           created_at: string
           date_time: string
           location_id: string
+          no_spots: number | null
           reserved: boolean
+          resulting_spots: number | null
+          spots_reserved: number | null
+          spots_taken: number
           timeslot_id: string
           updated_at: string
         }
         Insert: {
           available?: boolean
+          capacity?: number
           created_at?: string
           date_time: string
           location_id: string
+          no_spots?: number | null
           reserved?: boolean
+          resulting_spots?: number | null
+          spots_reserved?: number | null
+          spots_taken?: number
           timeslot_id?: string
           updated_at?: string
         }
         Update: {
           available?: boolean
+          capacity?: number
           created_at?: string
           date_time?: string
           location_id?: string
+          no_spots?: number | null
           reserved?: boolean
+          resulting_spots?: number | null
+          spots_reserved?: number | null
+          spots_taken?: number
           timeslot_id?: string
           updated_at?: string
         }

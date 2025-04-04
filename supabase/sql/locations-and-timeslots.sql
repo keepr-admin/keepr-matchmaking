@@ -11,10 +11,31 @@ SET address = 'Maakleerplek, Stapelhuisstraat 13, 3000 Leuven',
     google_maps_link = 'https://maps.google.com/maps?q=Stapelhuisstraat+13+3000+Leuven'
 WHERE name = 'Repair Café';
 
+-- Add description column to the locations table
+ALTER TABLE public.locations
+ADD COLUMN IF NOT EXISTS description TEXT;
+
+-- Update the locations with the provided descriptions
+UPDATE public.locations
+SET description = '1. Register for a time slot
+2. Come to Maakleerplek with your device at the scheduled time
+3. We ask for a voluntary contribution for this service
+
+The Herstel Hub Elektro is open once a week from 5 PM to 9 PM. Within a 1-hour time slot, we will try to repair your device. If that''s not possible, we''ll provide advice or discuss what else can be done.'
+WHERE name = 'Herstel Hub Elektro';
+
+UPDATE public.locations
+SET description = 'Every 3rd Saturday of the month, we organize a Repair Café in the canteen of Maakleerplek.
+
+To reduce waiting times, we try to work with 3 time slots of 1 hour each, during which we admit a number of visitors.
+
+Please note, we cannot always guarantee that you will be helped within this hour, but we do our best.'
+WHERE name = 'Repair Café';
+
 -- Add capacity column to the timeslots table to support multiple spots per timeslot
 ALTER TABLE public.timeslots 
-ADD COLUMN capacity INTEGER NOT NULL DEFAULT 1,
-ADD COLUMN spots_taken INTEGER NOT NULL DEFAULT 0;
+ADD COLUMN IF NOT EXISTS capacity INTEGER NOT NULL DEFAULT 1,
+ADD COLUMN IF NOT EXISTS spots_taken INTEGER NOT NULL DEFAULT 0;
 
 -- Create a function to check if a timeslot has available capacity
 CREATE OR REPLACE FUNCTION public.check_timeslot_capacity()
@@ -38,6 +59,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create a trigger to check capacity before inserting a new repair_timeslot
+DROP TRIGGER IF EXISTS check_timeslot_capacity_trigger ON public.repair_timeslots;
 CREATE TRIGGER check_timeslot_capacity_trigger
 BEFORE INSERT ON public.repair_timeslots
 FOR EACH ROW
@@ -57,6 +79,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create a trigger to decrement spots taken when a repair_timeslot is deleted
+DROP TRIGGER IF EXISTS decrement_spots_taken_trigger ON public.repair_timeslots;
 CREATE TRIGGER decrement_spots_taken_trigger
 AFTER DELETE ON public.repair_timeslots
 FOR EACH ROW
@@ -150,7 +173,7 @@ END;
 $$;
 
 -- Add a notification table for system messages
-CREATE TABLE public.notifications (
+CREATE TABLE IF NOT EXISTS public.notifications (
   notification_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL,
   title TEXT NOT NULL,
@@ -202,6 +225,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create a trigger to send notifications when a repair request is deleted
+DROP TRIGGER IF EXISTS notify_on_repair_request_delete_trigger ON public.repair_requests;
 CREATE TRIGGER notify_on_repair_request_delete_trigger
 BEFORE DELETE ON public.repair_requests
 FOR EACH ROW
