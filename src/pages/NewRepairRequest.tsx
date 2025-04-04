@@ -30,14 +30,14 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { supabase } from "@/integrations/supabase/client";
 
-// Sample data for device types
+// Device types must match exactly the enum values in the database
 const deviceTypes = [
-  "Vacuum Cleaner",
-  "Coffee Machine",
+  "Vacuum cleaner",
+  "Coffee machine",
   "TV",
   "Radio",
   "Lighting",
-  "Fume Hood",
+  "Fume hood",
   "Laptop",
   "Smartphone",
   "Other",
@@ -132,6 +132,7 @@ const NewRepairRequest = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
+    console.log("Submitted values:", values);
     
     try {
       // Check if user is authenticated
@@ -147,12 +148,12 @@ const NewRepairRequest = () => {
         return;
       }
       
-      // Create product
+      // Create product - ensure the type value exactly matches one of the enum values in the database
       const { data: product, error: productError } = await supabase
         .from('products')
         .insert({
           user_id: user.id,
-          type: values.deviceType as any,
+          type: values.deviceType,
           brand: values.brand || null,
           model: values.model || null,
           status: 'broken',
@@ -162,7 +163,7 @@ const NewRepairRequest = () => {
       
       if (productError) {
         console.error("Error creating product:", productError);
-        throw new Error("Failed to create product");
+        throw new Error(`Failed to create product: ${productError.message}`);
       }
       
       // Create repair request
@@ -206,7 +207,7 @@ const NewRepairRequest = () => {
       console.error("Submission error:", error);
       toast({
         title: "Submission failed",
-        description: "There was a problem submitting your repair request. Please try again.",
+        description: error instanceof Error ? error.message : "There was a problem submitting your repair request. Please try again.",
         variant: "destructive",
       });
     } finally {
