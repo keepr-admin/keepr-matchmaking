@@ -29,9 +29,13 @@ import { Image, Upload } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
+
+// Define product type using the Supabase generated types
+type ProductType = Database["public"]["Enums"]["product_type"];
 
 // Device types must match exactly the enum values in the database
-const deviceTypes = [
+const deviceTypes: ProductType[] = [
   "Vacuum cleaner",
   "Coffee machine",
   "TV",
@@ -44,7 +48,17 @@ const deviceTypes = [
 ];
 
 const formSchema = z.object({
-  deviceType: z.string({
+  deviceType: z.enum([
+    "Vacuum cleaner",
+    "Coffee machine",
+    "TV",
+    "Radio",
+    "Lighting",
+    "Fume hood",
+    "Laptop",
+    "Smartphone",
+    "Other",
+  ], {
     required_error: "Please select a device type",
   }),
   brand: z.string().optional(),
@@ -66,7 +80,7 @@ const NewRepairRequest = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      deviceType: "",
+      deviceType: undefined,
       brand: "",
       model: "",
       description: "",
@@ -153,7 +167,7 @@ const NewRepairRequest = () => {
         .from('products')
         .insert({
           user_id: user.id,
-          type: values.deviceType,
+          type: values.deviceType, // Now properly typed as ProductType
           brand: values.brand || null,
           model: values.model || null,
           status: 'broken',

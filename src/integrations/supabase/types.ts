@@ -334,7 +334,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_available_repair_timeslots: {
+        Args: {
+          repair_id: string
+        }
+        Returns: {
+          timeslot_id: string
+          date_time: string
+          location_id: string
+          location_name: string
+          is_available: boolean
+          capacity: number
+          spots_taken: number
+          spots_available: number
+        }[]
+      }
     }
     Enums: {
       product_status: "live" | "broken" | "inactive" | "transferable"

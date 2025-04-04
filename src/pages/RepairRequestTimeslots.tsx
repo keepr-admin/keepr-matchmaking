@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
@@ -133,7 +132,8 @@ const RepairRequestTimeslots = () => {
     }
   };
 
-  return <div className="min-h-screen flex flex-col">
+  return (
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-grow">
@@ -171,7 +171,8 @@ const RepairRequestTimeslots = () => {
       </main>
       
       <Footer />
-    </div>;
+    </div>
+  );
 };
 
 export default RepairRequestTimeslots;
