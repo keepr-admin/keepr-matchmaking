@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -138,22 +137,34 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({
         startOfDay.setHours(0, 0, 0, 0);
         const endOfDay = new Date(selectedDate);
         endOfDay.setHours(23, 59, 59, 999);
-        let query = supabase.from('timeslots').select('*').gte('date_time', startOfDay.toISOString()).lte('date_time', endOfDay.toISOString()).eq('available', true);
+        
+        let query = supabase
+          .from('timeslots')
+          .select('*')
+          .gte('date_time', startOfDay.toISOString())
+          .lte('date_time', endOfDay.toISOString())
+          .eq('available', true);
+          
         if (selectedLocationId) {
           query = query.eq('location_id', selectedLocationId);
         }
-        const {
-          data,
-          error
-        } = await query.order('date_time', {
+        
+        const { data, error } = await query.order('date_time', {
           ascending: true
         });
+        
         if (error) {
           console.error('Error fetching timeslots:', error);
           return;
         }
+        
         if (data) {
-          setTimeslots(data as Timeslot[]);
+          // Filter timeslots that still have available spots
+          const availableTimeslots = data.filter(slot => {
+            return (slot.capacity || 1) > (slot.spots_taken || 0);
+          });
+          
+          setTimeslots(availableTimeslots as Timeslot[]);
         }
       } catch (error) {
         console.error('Error in fetchTimeslots:', error);

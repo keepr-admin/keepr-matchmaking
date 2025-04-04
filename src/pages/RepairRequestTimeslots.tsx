@@ -76,7 +76,8 @@ const RepairRequestTimeslots = () => {
       }
       
       // Create repair_timeslots entries for each selected timeslot
-      // The database trigger will automatically increment the spots_taken count
+      // We mark as is_confirmed = false since these are just reservations
+      // A repairer will later confirm one of these slots
       const timeslotPromises = selectedTimeslots.map(async (timeslotId) => {
         const { data, error } = await supabase
           .from('repair_timeslots')
