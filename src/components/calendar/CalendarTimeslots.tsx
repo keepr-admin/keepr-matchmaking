@@ -16,6 +16,7 @@ import { format, isSameDay } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { Info, Users } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 type Timeslot = Tables<"timeslots"> & {
   capacity: number;
@@ -47,6 +48,7 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({
   const [selectedTimeslots, setSelectedTimeslots] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
+  const [allTimeslots, setAllTimeslots] = useState<Record<string, Timeslot>>({});
 
   // Fetch available dates based on selected location
   useEffect(() => {
@@ -90,6 +92,40 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({
       setCurrentLocation(null);
     }
   }, [selectedLocationId, locations]);
+
+  // Fetch all available timeslots for the selected location
+  useEffect(() => {
+    const fetchAllTimeslots = async () => {
+      if (!selectedLocationId) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('timeslots')
+          .select('*')
+          .eq('available', true)
+          .eq('location_id', selectedLocationId)
+          .order('date_time', { ascending: true });
+        
+        if (error) {
+          console.error('Error fetching all timeslots:', error);
+          return;
+        }
+        
+        if (data) {
+          // Create a record with timeslot_id as keys
+          const timeslotsMap: Record<string, Timeslot> = {};
+          data.forEach(slot => {
+            timeslotsMap[slot.timeslot_id] = slot as Timeslot;
+          });
+          setAllTimeslots(timeslotsMap);
+        }
+      } catch (error) {
+        console.error('Error in fetchAllTimeslots:', error);
+      }
+    };
+    
+    fetchAllTimeslots();
+  }, [selectedLocationId]);
 
   // Fetch timeslots for selected date and location
   useEffect(() => {
@@ -142,8 +178,7 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({
   // Handle date change
   const handleDateChange = (date: Date | undefined) => {
     setSelectedDate(date);
-    // Clear selected timeslots when changing date
-    setSelectedTimeslots([]);
+    // We no longer clear selected timeslots when changing date
   };
 
   // Handle submit
@@ -160,6 +195,45 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({
   // Check if a date has available timeslots (for dot indicator)
   const isDateAvailable = (date: Date) => {
     return availableDates.some(availableDate => isSameDay(availableDate, date));
+  };
+
+  // Show summary of selected timeslots
+  const getSelectedTimeslotsSummary = () => {
+    if (selectedTimeslots.length === 0) return null;
+    
+    // Group by date
+    const dateGroups: Record<string, { date: Date, times: string[] }> = {};
+    
+    selectedTimeslots.forEach(timeslotId => {
+      const slot = allTimeslots[timeslotId];
+      if (!slot) return;
+      
+      const date = new Date(slot.date_time);
+      const dateKey = date.toISOString().split('T')[0];
+      
+      if (!dateGroups[dateKey]) {
+        dateGroups[dateKey] = {
+          date,
+          times: []
+        };
+      }
+      
+      dateGroups[dateKey].times.push(format(date, 'h:mm a'));
+    });
+    
+    return (
+      <div className="mt-6 p-4 bg-keepr-green-50 rounded-lg">
+        <h4 className="text-keepr-green-800 font-medium mb-2">Your selected timeslots:</h4>
+        <ul className="space-y-2">
+          {Object.values(dateGroups).map(group => (
+            <li key={group.date.toISOString()} className="flex flex-col">
+              <span className="font-medium">{format(group.date, 'EEEE, MMMM d, yyyy')}:</span>
+              <span className="text-sm text-keepr-green-700">{group.times.join(', ')}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   };
 
   return (
@@ -271,6 +345,7 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({
                           const locationName = getLocationName(slot.location_id);
                           const availableSpots = (slot.capacity || 1) - (slot.spots_taken || 0);
                           const isFull = availableSpots <= 0;
+                          const percentFull = Math.round((slot.spots_taken / slot.capacity) * 100);
                           
                           return (
                             <Button 
@@ -293,6 +368,9 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({
                                   </div>
                                 </div>
                                 <span className="text-sm">{locationName}</span>
+                                <div className="mt-2 w-full">
+                                  <Progress value={percentFull} className="h-1" />
+                                </div>
                               </div>
                             </Button>
                           );
@@ -310,6 +388,9 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({
                   )}
                 </>
               )}
+              
+              {/* Show selected timeslots summary */}
+              {getSelectedTimeslotsSummary()}
             </div>
           </div>
         </div>

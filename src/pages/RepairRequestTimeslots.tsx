@@ -8,11 +8,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 type Location = Tables<"locations">;
+
 const RepairRequestTimeslots = () => {
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
@@ -22,10 +21,7 @@ const RepairRequestTimeslots = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const {
-          data,
-          error
-        } = await supabase.from('locations').select('*');
+        const { data, error } = await supabase.from('locations').select('*');
         if (error) {
           console.error('Error fetching locations:', error);
           return;
@@ -45,19 +41,65 @@ const RepairRequestTimeslots = () => {
     };
     fetchLocations();
   }, [selectedLocation]);
+
   const handleTimeslotsSelected = async (selectedTimeslots: string[]) => {
+    if (selectedTimeslots.length === 0) {
+      toast({
+        title: "No timeslots selected",
+        description: "Please select at least one timeslot for your repair request.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // In a real app, you would save these timeslots to the database
-      console.log("Selected timeslots:", selectedTimeslots);
+      // Get repair request ID from session storage (or another storage method)
+      const repairId = sessionStorage.getItem('repairRequestId');
+      
+      if (!repairId) {
+        throw new Error("No repair request ID found. Please start the repair request process again.");
+      }
+      
+      // Create repair_timeslots entries for each selected timeslot
+      const timeslotPromises = selectedTimeslots.map(async (timeslotId) => {
+        const { data, error } = await supabase
+          .from('repair_timeslots')
+          .insert({
+            repair_id: repairId,
+            timeslot_id: timeslotId,
+            is_confirmed: false
+          });
+          
+        if (error) {
+          console.error('Error creating repair timeslot:', error);
+          throw error;
+        }
+        
+        return data;
+      });
+      
+      await Promise.all(timeslotPromises);
+      
+      // Update repair request status to "timeslots_selected"
+      const { error: updateError } = await supabase
+        .from('repair_requests')
+        .update({ status: 'timeslots_selected' })
+        .eq('repair_id', repairId);
+        
+      if (updateError) {
+        console.error('Error updating repair request status:', updateError);
+        throw updateError;
+      }
 
-      // Simulate API call
-      setTimeout(() => {
-        setIsSubmitting(false);
+      toast({
+        title: "Timeslots submitted",
+        description: "Your timeslots have been successfully submitted.",
+        variant: "default"
+      });
 
-        // Redirect to confirmation page
-        navigate("/repair-request-confirmation");
-      }, 1000);
+      // Redirect to confirmation page
+      navigate("/repair-request-confirmation");
     } catch (error) {
       console.error("Error submitting timeslots:", error);
       toast({
@@ -65,9 +107,11 @@ const RepairRequestTimeslots = () => {
         description: "There was a problem submitting your timeslot selection. Please try again.",
         variant: "destructive"
       });
+    } finally {
       setIsSubmitting(false);
     }
   };
+
   return <div className="min-h-screen flex flex-col">
       <Navbar />
       
@@ -87,7 +131,13 @@ const RepairRequestTimeslots = () => {
         {/* Calendar Section */}
         <section className="py-8 px-4 md:px-8">
           <div className="container mx-auto">
-            <CalendarTimeslots onTimeslotsSelected={handleTimeslotsSelected} selectedLocationId={selectedLocation} locations={locations} onLocationChange={setSelectedLocation} loading={loading} />
+            <CalendarTimeslots 
+              onTimeslotsSelected={handleTimeslotsSelected} 
+              selectedLocationId={selectedLocation} 
+              locations={locations} 
+              onLocationChange={setSelectedLocation} 
+              loading={loading} 
+            />
             
             {isSubmitting && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                 <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
@@ -102,4 +152,5 @@ const RepairRequestTimeslots = () => {
       <Footer />
     </div>;
 };
+
 export default RepairRequestTimeslots;
