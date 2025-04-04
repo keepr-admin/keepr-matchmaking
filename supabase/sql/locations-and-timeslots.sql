@@ -85,6 +85,10 @@ AFTER DELETE ON public.repair_timeslots
 FOR EACH ROW
 EXECUTE FUNCTION public.decrement_spots_taken();
 
+-- Enable realtime functionality for the timeslots table
+ALTER TABLE public.timeslots REPLICA IDENTITY FULL;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.timeslots;
+
 -- Delete all existing timeslots to create new ones
 DELETE FROM public.timeslots;
 

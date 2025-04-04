@@ -164,6 +164,45 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({
     fetchTimeslots();
   }, [selectedDate, selectedLocationId]);
 
+  // Set up real-time subscription to timeslots updates
+  useEffect(() => {
+    // Subscribe to changes in the timeslots table
+    const channel = supabase
+      .channel('timeslots-changes')
+      .on('postgres_changes', 
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'timeslots' 
+        }, 
+        (payload) => {
+          console.log('Timeslot updated:', payload);
+          // Update the timeslot in our state
+          const updatedTimeslot = payload.new as Timeslot;
+          
+          // Update in allTimeslots
+          setAllTimeslots(prev => ({
+            ...prev,
+            [updatedTimeslot.timeslot_id]: updatedTimeslot
+          }));
+          
+          // Update in timeslots if it's displayed
+          setTimeslots(prev => 
+            prev.map(slot => 
+              slot.timeslot_id === updatedTimeslot.timeslot_id 
+                ? updatedTimeslot 
+                : slot
+            )
+          );
+        }
+      )
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   // Toggle timeslot selection
   const toggleTimeslot = (timeslotId: string) => {
     setSelectedTimeslots(prev => {
@@ -345,7 +384,7 @@ const CalendarTimeslots: React.FC<CalendarTimeslotsProps> = ({
                           const locationName = getLocationName(slot.location_id);
                           const availableSpots = (slot.capacity || 1) - (slot.spots_taken || 0);
                           const isFull = availableSpots <= 0;
-                          const percentFull = Math.round((slot.spots_taken / slot.capacity) * 100);
+                          const percentFull = Math.round(((slot.spots_taken || 0) / (slot.capacity || 1)) * 100);
                           
                           return (
                             <Button 

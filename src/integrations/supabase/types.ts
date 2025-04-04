@@ -43,6 +43,7 @@ export type Database = {
         Row: {
           address: string
           created_at: string
+          description: string | null
           google_maps_link: string | null
           location_id: string
           name: string
@@ -51,6 +52,7 @@ export type Database = {
         Insert: {
           address: string
           created_at?: string
+          description?: string | null
           google_maps_link?: string | null
           location_id?: string
           name: string
@@ -59,6 +61,7 @@ export type Database = {
         Update: {
           address?: string
           created_at?: string
+          description?: string | null
           google_maps_link?: string | null
           location_id?: string
           name?: string

@@ -76,6 +76,7 @@ const RepairRequestTimeslots = () => {
       }
       
       // Create repair_timeslots entries for each selected timeslot
+      // The database trigger will automatically increment the spots_taken count
       const timeslotPromises = selectedTimeslots.map(async (timeslotId) => {
         const { data, error } = await supabase
           .from('repair_timeslots')
@@ -105,35 +106,6 @@ const RepairRequestTimeslots = () => {
         console.error('Error updating repair request status:', updateError);
         throw updateError;
       }
-
-      // Update spots_taken for each selected timeslot
-      const updateTimeslotPromises = selectedTimeslots.map(async (timeslotId) => {
-        // First get the current spots_taken
-        const { data: timeslotData, error: fetchError } = await supabase
-          .from('timeslots')
-          .select('spots_taken')
-          .eq('timeslot_id', timeslotId)
-          .single();
-          
-        if (fetchError) {
-          console.error('Error fetching timeslot data:', fetchError);
-          return;
-        }
-        
-        // Then increment spots_taken
-        const { error: updateError } = await supabase
-          .from('timeslots')
-          .update({ 
-            spots_taken: (timeslotData.spots_taken || 0) + 1 
-          })
-          .eq('timeslot_id', timeslotId);
-          
-        if (updateError) {
-          console.error('Error updating timeslot spots:', updateError);
-        }
-      });
-      
-      await Promise.all(updateTimeslotPromises);
 
       toast({
         title: "Timeslots submitted",
