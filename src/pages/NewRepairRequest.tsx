@@ -134,17 +134,73 @@ const NewRepairRequest = () => {
     setIsSubmitting(true);
     
     try {
-      // In a real app, you would upload images and create the repair request using Supabase
-      console.log("Form values:", values);
-      console.log("Images:", images);
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
       
-      // For demo purposes, simulate API call
-      setTimeout(() => {
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to submit a repair request.",
+          variant: "destructive",
+        });
         setIsSubmitting(false);
-        
-        // Redirect to timeslot selection
-        navigate("/repair-request-timeslots");
-      }, 1500);
+        return;
+      }
+      
+      // Create product
+      const { data: product, error: productError } = await supabase
+        .from('products')
+        .insert({
+          user_id: user.id,
+          type: values.deviceType as any,
+          brand: values.brand || null,
+          model: values.model || null,
+          status: 'broken',
+        })
+        .select('product_id')
+        .single();
+      
+      if (productError) {
+        console.error("Error creating product:", productError);
+        throw new Error("Failed to create product");
+      }
+      
+      // Create repair request
+      const { data: repairRequest, error: repairError } = await supabase
+        .from('repair_requests')
+        .insert({
+          user_id: user.id,
+          product_id: product.product_id,
+          description: values.description,
+          status: 'created',
+        })
+        .select('repair_id')
+        .single();
+      
+      if (repairError) {
+        console.error("Error creating repair request:", repairError);
+        throw new Error("Failed to create repair request");
+      }
+      
+      // Store the repair request ID in sessionStorage
+      sessionStorage.setItem('repairRequestId', repairRequest.repair_id);
+      
+      toast({
+        title: "Repair request created",
+        description: "Now let's select available timeslots.",
+        variant: "default",
+      });
+      
+      // For demo purposes, we'll upload the images here
+      // In a real app, you would upload images to Supabase Storage
+      // const uploadPromises = images.map(async (image) => {
+      //   // Upload image code would go here
+      // });
+      
+      // await Promise.all(uploadPromises);
+      
+      // Redirect to timeslot selection
+      navigate("/repair-request-timeslots");
       
     } catch (error) {
       console.error("Submission error:", error);
@@ -153,6 +209,7 @@ const NewRepairRequest = () => {
         description: "There was a problem submitting your repair request. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsSubmitting(false);
     }
   };

@@ -1,11 +1,27 @@
 
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 
 const RepairRequestConfirmation = () => {
+  const navigate = useNavigate();
+
+  // Check if the user came from a completed repair request
+  useEffect(() => {
+    const completed = sessionStorage.getItem('repairRequestCompleted');
+    
+    if (completed !== 'true') {
+      // If they didn't complete a repair request, redirect to home
+      navigate('/');
+    } else {
+      // Clear the flag after successful verification
+      sessionStorage.removeItem('repairRequestCompleted');
+    }
+  }, [navigate]);
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />

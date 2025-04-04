@@ -17,6 +17,20 @@ const RepairRequestTimeslots = () => {
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Check for repair request ID on mount
+  useEffect(() => {
+    const repairId = sessionStorage.getItem('repairRequestId');
+    if (!repairId) {
+      toast({
+        title: "Error",
+        description: "No repair request found. Please start the repair request process again.",
+        variant: "destructive"
+      });
+      navigate('/new-repair-request');
+      return;
+    }
+  }, [navigate, toast]);
+
   // Fetch locations
   useEffect(() => {
     const fetchLocations = async () => {
@@ -54,7 +68,7 @@ const RepairRequestTimeslots = () => {
 
     setIsSubmitting(true);
     try {
-      // Get repair request ID from session storage (or another storage method)
+      // Get repair request ID from session storage
       const repairId = sessionStorage.getItem('repairRequestId');
       
       if (!repairId) {
@@ -92,11 +106,45 @@ const RepairRequestTimeslots = () => {
         throw updateError;
       }
 
+      // Update spots_taken for each selected timeslot
+      const updateTimeslotPromises = selectedTimeslots.map(async (timeslotId) => {
+        // First get the current spots_taken
+        const { data: timeslotData, error: fetchError } = await supabase
+          .from('timeslots')
+          .select('spots_taken')
+          .eq('timeslot_id', timeslotId)
+          .single();
+          
+        if (fetchError) {
+          console.error('Error fetching timeslot data:', fetchError);
+          return;
+        }
+        
+        // Then increment spots_taken
+        const { error: updateError } = await supabase
+          .from('timeslots')
+          .update({ 
+            spots_taken: (timeslotData.spots_taken || 0) + 1 
+          })
+          .eq('timeslot_id', timeslotId);
+          
+        if (updateError) {
+          console.error('Error updating timeslot spots:', updateError);
+        }
+      });
+      
+      await Promise.all(updateTimeslotPromises);
+
       toast({
         title: "Timeslots submitted",
         description: "Your timeslots have been successfully submitted.",
         variant: "default"
       });
+
+      // Clear the repair request ID from session storage
+      // We'll set a flag to indicate the process is complete
+      sessionStorage.removeItem('repairRequestId');
+      sessionStorage.setItem('repairRequestCompleted', 'true');
 
       // Redirect to confirmation page
       navigate("/repair-request-confirmation");
