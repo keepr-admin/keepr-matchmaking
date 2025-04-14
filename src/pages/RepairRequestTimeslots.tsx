@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
@@ -78,7 +79,7 @@ const RepairRequestTimeslots = () => {
       // We mark as is_confirmed = false since these are just reservations
       // A repairer will later confirm one of these slots
       const timeslotPromises = selectedTimeslots.map(async (timeslotId) => {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('repair_timeslots')
           .insert({
             repair_id: repairId,
@@ -90,8 +91,6 @@ const RepairRequestTimeslots = () => {
           console.error('Error creating repair timeslot:', error);
           throw error;
         }
-        
-        return data;
       });
       
       await Promise.all(timeslotPromises);

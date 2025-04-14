@@ -4,11 +4,8 @@
 CREATE OR REPLACE FUNCTION public.check_timeslot_capacity()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Get current spots taken for this timeslot
-  SELECT spots_taken INTO NEW.spots_taken FROM public.timeslots WHERE timeslot_id = NEW.timeslot_id;
-  
   -- Check if the timeslot has available capacity (only matters for confirmed slots)
-  IF NEW.is_confirmed = TRUE AND NEW.spots_taken >= (SELECT capacity FROM public.timeslots WHERE timeslot_id = NEW.timeslot_id) THEN
+  IF NEW.is_confirmed = TRUE AND (SELECT spots_taken FROM public.timeslots WHERE timeslot_id = NEW.timeslot_id) >= (SELECT capacity FROM public.timeslots WHERE timeslot_id = NEW.timeslot_id) THEN
     RAISE EXCEPTION 'Timeslot is at full capacity';
   END IF;
   
