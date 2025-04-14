@@ -1,3 +1,4 @@
+
 import Index from "@/pages/Index";
 import HowItWorks from "@/pages/HowItWorks";
 import Contact from "@/pages/Contact";
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
   {
     path: "/repair-requests",
     element: <RepairRequests />,
+  },
+  {
+    path: "/:repairId",
+    element: <RepairRequests />, // Show repair details
   },
   {
     path: "/new-repair-request",

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Dialog, 
   DialogContent, 
@@ -11,19 +11,29 @@ import RegisterForm from "./RegisterForm";
 import VerificationForm from "./VerificationForm";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useLocation } from "react-router-dom";
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: "repair" | "help";
+  type: "repair" | "help" | "login";
 }
 
 type AuthStep = "login" | "register" | "verify";
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type }) => {
-  const [step, setStep] = useState<AuthStep>("register");
+  const [step, setStep] = useState<AuthStep>(type === "login" ? "login" : "register");
   const [email, setEmail] = useState("");
   const { toast } = useToast();
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  useEffect(() => {
+    // Reset step when modal opens
+    if (isOpen) {
+      setStep(type === "login" ? "login" : "register");
+    }
+  }, [isOpen, type]);
 
   const handleLoginClick = () => {
     setStep("login");
@@ -72,10 +82,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type }) => {
     
     onClose();
     
-    // Redirect based on the type
-    if (type === "repair") {
+    // Redirect based on the type and current path
+    if (currentPath.startsWith('/') && currentPath.length > 1 && !currentPath.includes('/dashboard')) {
+      // Stay on the current path (e.g., repair detail page)
+      return;
+    } else if (type === "repair") {
       window.location.href = "/new-repair-request";
-    } else {
+    } else if (type === "help") {
       window.location.href = "/repair-requests";
     }
   };
@@ -110,15 +123,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type }) => {
     
     onClose();
     
-    // Redirect based on the type
-    if (type === "repair") {
+    // Redirect based on the type and current path
+    if (currentPath.startsWith('/') && currentPath.length > 1 && !currentPath.includes('/dashboard')) {
+      // Stay on the current path (e.g., repair detail page)
+      return;
+    } else if (type === "repair") {
       window.location.href = "/new-repair-request";
-    } else {
+    } else if (type === "help") {
       window.location.href = "/repair-requests";
     }
   };
 
   const getTitle = () => {
+    if (type === "login" || step === "login") {
+      return null; // No title for login
+    }
+    
     if (type === "repair") {
       return "Request a Repair";
     }
@@ -126,8 +146,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type }) => {
   };
 
   const getDescription = () => {
+    if (type === "login" || step === "login") {
+      return null; // No description for login
+    }
+    
     if (type === "repair") {
-      return "Connect with volunteer repairers in your neighborhood who can help fix your broken device.";
+      return "Register to connect with volunteer repairers in your neighborhood who can help fix your broken device.";
     }
     return "Browse repair requests in your area and help others fix their broken devices.";
   };
@@ -135,16 +159,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
-        <DialogTitle className="text-repair-green-700">{getTitle()}</DialogTitle>
-        <DialogDescription className="text-repair-green-600">
-          {getDescription()}
-        </DialogDescription>
+        {getTitle() && <DialogTitle className="text-repair-green-700">{getTitle()}</DialogTitle>}
+        {getDescription() && (
+          <DialogDescription className="text-repair-green-600">
+            {getDescription()}
+          </DialogDescription>
+        )}
 
         {step === "register" && (
           <RegisterForm 
             onLoginClick={handleLoginClick} 
             onRegisterSuccess={handleRegisterSuccess}
-            type={type}
+            type={type === "login" ? "repair" : type}
           />
         )}
 

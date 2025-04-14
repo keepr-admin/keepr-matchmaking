@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogIn, User } from "lucide-react";
 import Logo from "@/components/common/Logo";
@@ -18,9 +18,10 @@ import { toast } from "sonner";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"repair" | "help">("repair");
+  const [modalType, setModalType] = useState<"repair" | "help" | "login">("repair");
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   
@@ -61,6 +62,11 @@ const Navbar = () => {
       setModalType("help");
       setIsAuthModalOpen(true);
     }
+  };
+  
+  const openLoginModal = () => {
+    setModalType("login");
+    setIsAuthModalOpen(true);
   };
   
   const handleSignOut = async () => {
@@ -145,7 +151,7 @@ const Navbar = () => {
             <Button 
               variant="ghost" 
               className="flex items-center gap-1 text-keepr-green-700"
-              onClick={() => setIsAuthModalOpen(true)}
+              onClick={openLoginModal}
             >
               <LogIn className="h-4 w-4" />
               <span>Login</span>
@@ -221,7 +227,7 @@ const Navbar = () => {
                 variant="ghost" 
                 className="w-full justify-center text-keepr-green-700"
                 onClick={() => {
-                  setIsAuthModalOpen(true);
+                  openLoginModal();
                   setIsMenuOpen(false);
                 }}
               >

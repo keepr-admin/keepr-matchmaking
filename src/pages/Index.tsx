@@ -1,25 +1,37 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Wrench, Users, Calendar, Clock } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import AuthModal from "@/components/auth/AuthModal";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"repair" | "help">("repair");
+  const [modalType, setModalType] = useState<"repair" | "help" | "login">("repair");
+  const navigate = useNavigate();
   
-  const openRepairModal = () => {
-    setModalType("repair");
-    setIsAuthModalOpen(true);
+  const openRepairModal = async () => {
+    const { data } = await supabase.auth.getUser();
+    if (data.user) {
+      navigate("/new-repair-request");
+    } else {
+      setModalType("repair");
+      setIsAuthModalOpen(true);
+    }
   };
   
-  const openHelpModal = () => {
-    setModalType("help");
-    setIsAuthModalOpen(true);
+  const openHelpModal = async () => {
+    const { data } = await supabase.auth.getUser();
+    if (data.user) {
+      navigate("/repair-requests");
+    } else {
+      setModalType("help");
+      setIsAuthModalOpen(true);
+    }
   };
   
   return (
