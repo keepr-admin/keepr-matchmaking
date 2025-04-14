@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, AlertCircle } from "lucide-react";
+import { Search, AlertCircle, Calendar } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -78,6 +78,8 @@ const RepairsList = () => {
     switch (status) {
       case 'pending':
         return { label: 'Pending', color: 'bg-keepr-yellow-200 text-keepr-green-700' };
+      case 'timeslots_selected':
+        return { label: 'Awaiting Confirmation', color: 'bg-blue-200 text-blue-700' };
       case 'accepted':
         return { label: 'Accepted', color: 'bg-keepr-green-200 text-keepr-green-700' };
       case 'scheduled':
@@ -104,7 +106,7 @@ const RepairsList = () => {
       <div>
         <h2 className="text-2xl font-bold text-keepr-green-800">Repairs</h2>
         <p className="text-keepr-green-600">
-          View and manage repairs you have helped with.
+          View and manage repairs you can help with.
         </p>
       </div>
       
@@ -141,6 +143,8 @@ const RepairsList = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
           {filteredRepairs.map((repair) => {
             const { label, color } = getStatusDetails(repair.status);
+            const isAwaitingConfirmation = repair.status === 'timeslots_selected';
+            
             return (
               <Card className="card-hover h-full" key={repair.repair_id}>
                 <CardContent className="p-6">
@@ -160,9 +164,18 @@ const RepairsList = () => {
                     {repair.description}
                   </p>
                   
-                  <div className="text-keepr-green-600 text-xs">
+                  <div className="text-keepr-green-600 text-xs mb-4">
                     Added on {format(new Date(repair.created_at), 'MMM d, yyyy')}
                   </div>
+                  
+                  {isAwaitingConfirmation && (
+                    <Link to={`/repairer/timeslots/${repair.repair_id}`}>
+                      <Button className="w-full bg-keepr-green-600 hover:bg-keepr-green-700 text-white">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Confirm Timeslot
+                      </Button>
+                    </Link>
+                  )}
                 </CardContent>
               </Card>
             );
