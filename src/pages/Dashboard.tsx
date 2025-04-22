@@ -138,9 +138,9 @@ const Dashboard = () => {
           "fixed md:static inset-y-0 z-40 md:translate-x-0 h-full"
         )}>
           <div className="flex h-full flex-col">
-            <div className="flex h-14 items-center border-b px-4">
-              <Logo size={24} />
-              <span className="ml-2 text-lg font-medium text-keepr-green-800">Dashboard</span>
+            <div className="flex h-16 items-center border-b px-4">
+              <Logo size={32} />
+              <span className="ml-3 text-lg font-medium text-keepr-green-800">Dashboard</span>
             </div>
             
             <ScrollArea className="flex-1 px-3 py-4">

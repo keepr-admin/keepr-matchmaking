@@ -8,8 +8,8 @@ const Footer = () => {
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="flex flex-col space-y-4">
-            <Link to="/" className="flex items-center gap-2">
-              <Logo size={32} />
+            <Link to="/" className="flex items-center gap-3">
+              <Logo size={40} />
               <span className="font-semibold text-xl text-keepr-green-700">Keepr</span>
             </Link>
             <p className="text-keepr-green-800 max-w-md">

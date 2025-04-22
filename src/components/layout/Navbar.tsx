@@ -83,8 +83,9 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-sm py-3 px-4 md:px-8 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="flex items-center gap-2">
-          <Logo />
+        <Link to="/" className="flex items-center gap-3">
+          <Logo size={32} />
+          <span className="font-medium text-xl text-keepr-green-700">Keepr</span>
         </Link>
 
         {/* Desktop Navigation */}
