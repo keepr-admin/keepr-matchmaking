@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -85,7 +84,6 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-3">
           <Logo size={32} />
-          <span className="font-medium text-xl text-keepr-green-700">Keepr</span>
         </Link>
 
         {/* Desktop Navigation */}

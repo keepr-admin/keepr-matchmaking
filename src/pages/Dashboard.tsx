@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Navigate, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { 
@@ -34,14 +33,12 @@ const Dashboard = () => {
   const location = useLocation();
   
   useEffect(() => {
-    // Set up auth state listener first
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user || null);
       setLoading(false);
     });
     
-    // Then check for existing session
     const checkUser = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -72,12 +69,10 @@ const Dashboard = () => {
     }
   };
   
-  // If user is not authenticated and finished loading, redirect to home
   if (!loading && !user) {
     return <Navigate to="/" replace />;
   }
   
-  // Navigate to /dashboard/profile by default if no subroute is specified
   if (location.pathname === "/dashboard") {
     return <Navigate to="/dashboard/profile" replace />;
   }
@@ -117,7 +112,6 @@ const Dashboard = () => {
       <Navbar />
       
       <div className="flex flex-1 overflow-hidden">
-        {/* Mobile Sidebar Toggle */}
         <Button
           variant="ghost"
           size="icon"
@@ -131,7 +125,6 @@ const Dashboard = () => {
           )}
         </Button>
         
-        {/* Sidebar */}
         <aside className={cn(
           "w-64 flex-shrink-0 bg-keepr-green-50 border-r transition-all duration-300 ease-in-out",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
@@ -140,7 +133,6 @@ const Dashboard = () => {
           <div className="flex h-full flex-col">
             <div className="flex h-16 items-center border-b px-4">
               <Logo size={32} />
-              <span className="ml-3 text-lg font-medium text-keepr-green-800">Dashboard</span>
             </div>
             
             <ScrollArea className="flex-1 px-3 py-4">
@@ -194,7 +186,6 @@ const Dashboard = () => {
           </div>
         </aside>
         
-        {/* Main Content */}
         <main className={cn(
           "flex-1 overflow-auto transition-all duration-300 ease-in-out",
           !sidebarOpen && "md:ml-0"
