@@ -14,7 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Navbar from "@/components/layout/Navbar";
-import Logo from "@/components/common/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import Profile from "@/components/dashboard/Profile";
 import Chats from "@/components/dashboard/Chats";
@@ -23,6 +22,7 @@ import Products from "@/components/dashboard/Products";
 import Repairs from "@/components/dashboard/Repairs";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import Logo from "@/components/common/Logo";
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -132,7 +132,7 @@ const Dashboard = () => {
         )}>
           <div className="flex h-full flex-col">
             <div className="flex h-16 items-center border-b px-4">
-              <Logo size={32} />
+              {/* Logo component removed */}
             </div>
             
             <ScrollArea className="flex-1 px-3 py-4">
